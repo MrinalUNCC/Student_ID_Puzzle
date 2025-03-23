@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliding Puzzle Game</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #343a40;
+            margin-bottom: 10px;
+        }
+
+        p.instructions {
+            font-size: 1.2rem;
+            color: #495057;
+            margin-bottom: 20px;
+        }
+
+        /* Puzzle container */
+        #game-container {
+            text-align: center;
+        }
+
+        #puzzle {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .tile {
+            width: 80px;
+            height: 80px;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Tile colors */
+        .tile:nth-child(odd) {
+            background-color: #6a4b3e; /* Dark brown */
+            color: white; /* White text */
+        }
+
+        .tile:nth-child(even) {
+            background-color: #d9d4c5; /* Light beige */
+            color: black; /* Black text */
+        }
+
+        .empty {
+            background-color: #f8f9fa; /* Light background for empty tile */
+        }
+
+        /* Buttons */
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff; /* Blue button */
+            color: white;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        /* Message styles */
+        p#message {
+            font-size: 1.2rem;
+            color: #28a745; /* Green for success message */
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Sliding Puzzle Game</h1>
+        <p class="instructions">Arrange the tiles to match the sequence of your Student ID. Click tiles adjacent to the empty space to move them.</p>
+        
+        <!-- Puzzle grid -->
+        <div id="puzzle"></div>
+
+        <!-- Buttons -->
+        <button onclick="shufflePuzzle()">Shuffle</button>
+        <button onclick="provideHint()">Get Hint</button>
+        <button onclick="showSolution()">Show Solution</button>
+
+        <!-- Message -->
+        <p id="message"></p>
+    </div>
+
+    <script>
+        const studentId = "801377155"; // Replace with your Student ID
+        const puzzleSize = 8; // Number of tiles (excluding empty space)
+        let currentOrder = [];
+        
+        // Create the puzzle grid
+        function createPuzzle() {
+            const puzzle = document.getElementById('puzzle');
+            
+            // Clear any existing tiles
+            puzzle.innerHTML = '';
+            
+            // Create tiles for the puzzle
+            for (let i = 0; i < puzzleSize; i++) {
+                const tile = document.createElement('div');
+                tile.classList.add('tile');
+                tile.addEventListener('click', () => moveTile(i));
+                puzzle.appendChild(tile);
+            }
+            
+            // Add the empty tile
+            const emptyTile = document.createElement('div');
+            emptyTile.classList.add('tile', 'empty');
+            puzzle.appendChild(emptyTile);
+            
+            shufflePuzzle();
+        }
+
+        // Shuffle the tiles
+        function shufflePuzzle() {
+             currentOrder=studentId.slice(0,puzzleSize).split("");currentOrder.push("");
+
+             do{currentOrder.sort(()=>Math.random()-.5);}while(!isSolvable(currentOrder));
+
+             updatePuzzleDisplay();}
+
+function isSolvable(arr){let inversions=0;
+
+for(let i=0;i<arr.length;i++)for(let j=i+1;j<arr.length;j++)if(arr[i]&&arr[j]&&arr[i]>arr[j])inversions++;
+
+return inversions%2===0;}
+
+function updatePuzzleDisplay(){const tiles=document.querySelectorAll(".tile");tiles.forEach((tile,index)=>{tile.textContent=currentOrder[index];
+tile.classList.toggle("empty",currentOrder[index]==="");checkWinCondition();});}
+
+function moveTile(index){const emptyIndex=currentOrder.indexOf("");if(isAdjacent(index,emptyIndex)){[currentOrder[index],currentOrder[emptyIndex]]=[currentOrder[emptyIndex],currentOrder[index]];
+updatePuzzleDisplay();}}
+
+function isAdjacent(index1,index2){const row1=Math.floor(index1/3),row2=Math.floor(index2/3),col1=index1%3,col2=index2%3;
+
+return Math.abs(row1-row2)+Math.abs(col1-col2)===1;}
+
+function checkWinCondition(){const targetSequence=studentId.slice(0,puzzleSize),message=document.getElementById("message");
+
+if(currentOrder.slice(0,-1).join("")===targetSequence){message.textContent="🎉 Congratulations! You've solved the puzzle!";
+document.querySelectorAll(".tile").forEach(tile=>tile.style.cursor="default");}}
+
+function provideHint(){const emptyIndex=currentOrder.indexOf(""),hintMessage=document.getElementById("message");
+
+hintMessage.textContent=`Hint! Try moving a tile adjacent to the empty space at position ${emptyIndex+1}.`;}
+
+function showSolution(){currentOrder=studentId.slice(0,puzzleSize).split("");currentOrder.push("");
+
+updatePuzzleDisplay();document.getElementById("message").textContent="Solution displayed!";}
+
+createPuzzle();
+</script></body></html>
